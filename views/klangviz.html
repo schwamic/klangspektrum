@@ -1,0 +1,429 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta name="author" content="Michael Schwarz">
+	<meta name="description" content="A data visualisation to analyze the music behaviour using algorithmically calculated values.">
+	<title>Klangspektrum</title>
+	<link rel="stylesheet" href="css/fonts.css">
+	<link rel="stylesheet" href="css/styles.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+</head>
+
+<body>
+	<!-- if error redirect to index -->
+	<script>
+		var getQueryString = function (field, url) {
+			var href = url ? url : window.location.href;
+			var reg = new RegExp('[#&]' + field + '=([^&#]*)', 'i');
+			var string = reg.exec(href);
+			return string ? string[1] : null;
+		};
+		if(getQueryString('error')=="invalid_token"){
+			window.location.href = `http://${document.location.host}/`;
+		};
+	</script>
+
+	<!-- defs -->
+	<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+		<defs>
+			<g id="shape-icon-1" class="shape-icon">
+				<circle fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" cx="134.125" cy="133.5" r="130" />
+				<polygon stroke="#000000" stroke-miterlimit="10" points="202,133.5 98.5,64.708 98.5,202.292 	" />
+			</g>
+			<g id="shape-icon-2" class="shape-icon">
+				<polygon stroke="#000000" stroke-miterlimit="10" points="660,133.5 556.5,64.708 556.5,202.292 	" />
+			</g>
+			<g id="shape-icon-3" class="shape-icon">
+				<circle fill="#FFFFFF" stroke="#000000" stroke-miterlimit="10" cx="401.125" cy="133.5" r="130" />
+				<rect x="358.5" y="65" stroke="#000000" stroke-miterlimit="10" width="30" height="137" />
+				<rect x="414.5" y="65" stroke="#000000" stroke-miterlimit="10" width="30" height="137" />
+			</g>
+			<g id="shape-icon-4" class="shape-icon">
+				<rect x="701.5" y="65" stroke="#000000" stroke-miterlimit="10" width="30" height="137" />
+				<rect x="757.5" y="65" stroke="#000000" stroke-miterlimit="10" width="30" height="137" />
+			</g>
+		</defs>
+	</svg>
+
+	<!-- menu -->
+	<div id="mySidenav" class="sidenav">
+		<a id="nav_legend">LEGEND</a>
+		<a id="nav_about">ABOUT</a> 
+		<a id="logout" href="#">LOGOUT</a>
+	</div>
+
+	<!-- nav-icon -->
+	<div id="nav-icon1">
+		<span></span>
+		<span id="span_center"></span>
+		<span></span>
+	</div>
+
+	<!-- legend -->
+	<div id="legend_content" class="start_legend">
+		<h2 id="farbcode" class="h2_title">COLOUR CODE</h2>
+		<div class="legend_inner">
+			<p>The data visualisation shows your music archive where only the songs are shown which you added to your playlists. 
+				Every song is described by seven categories. Each category has its own colour: </p>
+				<ul>
+				<li>
+					<svg viewBox="-0.5 -0.5 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+						width="20px" height="20px">
+						<circle cx="0" cy="0" r="0.5" style="fill:rgb(239, 174, 44);">
+						</circle>
+					</svg>
+					<p class="legend_li">acousticness</p>
+					<p class="legend_li_text">shows how acoustic a song is.</p>
+				</li>
+				<li>
+					<svg viewBox="-0.5 -0.5 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+						width="20px" height="20px">
+						<circle cx="0" cy="0" r="0.5" style="fill:rgb(105, 193, 135);">
+						</circle>
+					</svg>
+					<p class="legend_li">mood</p>
+					<p class="legend_li_text">classifies the mood of a song into a spectrum from 0 to 1 and respectively from sad to happy. </p>
+				</li>
+				<li>
+					<svg viewBox="-0.5 -0.5 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+						width="20px" height="20px">
+						<circle cx="0" cy="0" r="0.5" style="fill:rgb(116, 78, 197);">
+						</circle>
+					</svg>
+					<p class="legend_li">energy</p>
+					<p class="legend_li_text">represents the intensity and activity of a song.</p>
+				</li>
+				<li>
+					<svg viewBox="-0.5 -0.5 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+						width="20px" height="20px">
+						<circle cx="0" cy="0" r="0.5" style="fill:rgb(40, 132, 197);">
+						</circle>
+					</svg>
+					<p class="legend_li">liveness</p>
+					<p class="legend_li_text">registers how live a song is and is able to identify audience sounds in a recording.</p>
+				</li>
+				<li>
+					<svg viewBox="-0.5 -0.5 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+						width="20px" height="20px">
+						<circle cx="0" cy="0" r="0.5" style="fill:rgb(227, 44, 78);">
+						</circle>
+					</svg>
+					<p class="legend_li">danceability</p>
+					<p class="legend_li_text">describes how danceable a song is.</p>
+				</li>
+				<li>
+					<svg viewBox="-0.5 -0.5 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+						width="20px" height="20px">
+						<circle cx="0" cy="0" r="0.5" style="fill:rgb(70, 206, 196);">
+						</circle>
+					</svg>
+					<p class="legend_li">speechiness</p>
+					<p class="legend_li_text">analyses the song to distinguish between spoken words and singing.</p>
+				</li>
+				<li>
+					<svg viewBox="-0.5 -0.5 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+						width="20px" height="20px">
+						<circle cx="0" cy="0" r="0.5" style="fill:rgb(252, 102, 18);">
+						</circle>
+					</svg>
+					<p class="legend_li">instrumentalness</p>
+					<p class="legend_li_text">addresses the parts without singing or spoken words, the instrumental parts, of a song.</p>
+				</li>
+			</ul>
+		</div>
+		<h2 class="h2_title">PRESENTATION</h2>
+		<div class="legend_inner">
+			<p class="text_bottom">Every category consists of 100 values between 0 and 1, in which 1 stands for the highest intensity. 
+				Each value is displayed as an own circle. The number of songs which share the same value in the same category define the diameter of the circle:</p>
+			<svg class="c_wrapper" viewBox="-0.5 -0.5 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+				width="50px" height="50px">
+				<circle cx="0" cy="0" r="0.5">
+				</circle>
+			</svg>
+			<svg class="c_wrapper circle_5" viewBox="-0.5 -0.5 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+				width="20px" height="20px">
+				<circle cx="0" cy="0" r="0.5">
+				</circle>
+			</svg>
+			<div class="legend_text">
+				<p id="value_50">= 50 songs with the same value in the same category</p>
+				<p id="value_5">= 5 songs with the same value in the same category</p>
+			</div>
+			<p class="innertext_top">The closer the value reaches to 1, the higher the frequency in sound and scaling gets:</p>
+			<svg class="c_wrapper circle_5" viewBox="-0.5 -0.5 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+				width="20px" height="20px">
+				<circle id="circle_0" cx="0" cy="0" r="0.5">
+				</circle>
+			</svg>
+			<svg id="c1_wrapper" class="circle_5" viewBox="-0.5 -0.5 1 1" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+				width="20px" height="20px">
+				<circle id="circle_1" cx="0" cy="0" r="0.5">
+				</circle>
+			</svg>
+			<div class="legend_text">
+				<p id="value_1">= 1</p>
+				<p id="value_0">= 0</p>
+			</div>
+		</div>
+		<h2 class="h2_title">INTERACTION</h2>
+		<div class="legend_inner">
+			<p>
+				<b>Click</b> <br> When a circle gets clicked on its related circles are shown in their particular category colour. 
+				Circles that are unrelated to the selected circle retreat into the background.
+			</p>
+			<p>
+				<b>Hover</b><br>A circle shows his music attributes when active and hovered over.
+			</p>
+		</div>
+	</div>
+	<!-- about content -->
+	<div id="about_content">
+		<h2 id="farbcode" class="h2_title">KLANGSPEKTRUM</h2>
+		<div class="legend_inner">
+			<p>We are living in an increaslingly digitised world but most of us barely have any background knowledge about digital processes. Due to the digital age streaming services gradually evolve. Music streaming services like Spotify massively changed the music industry and the musical behaviour of their users. Current studies show that the individual musical behaviour turns away more and more from criteria such as genre or artists. The once established criteria seem to get replaced by intelligent algorithms that work in the background.
+			<br><br>
+			Spotify is for most of its users what you call a "black box", which means that people without any expert knowledge are not able to understand what kind of processes are going on in the technical background of the application. This interactive data visualisation was created to make Spotify more transparent for its users.
+			<br><br>
+			Klangspektrum enables Spotify users to analyse their musical behaviour based on simplyfied algorithmically calculated song attributes. The user should be able to establish a relation between already familiar parameters such as songs and genres and the abstract song values. Metaphorically speaking the observer transforms into an algorithm to analyse his /her own music profile.</p>
+			<a id="nav_thesis" href="/api/download">bachelorthesis-klangspektrum.pdf</a> 
+			<a id="nav_imprint" href="/imprint">imprint</a> 
+		</div>
+	</div>
+	<!-- visualisation sketch -->
+	<div id="loadingContainer">
+
+		<div class="logo_viz">
+			<?xml version="1.0" encoding="utf-8"?>
+			<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+			<svg version="1.1" id="Ebene_1" class="logo_svg_small" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+				x="0px" y="0px" width="580px" height="215px" viewBox="0 0 580 215" enable-background="new 0 0 580 215" xml:space="preserve">
+				<g id="Ebene_2" display="none">
+					<rect x="-82" y="-66.5" display="inline" fill="#808A80" width="780" height="346" />
+				</g>
+				<g id="Ebene_1_1_">
+					<path fill="#FFFFFF" d="M30.9,47.504h-7.82v32.177H7.98V2.542h15.099v31.52h7.82l17.634-31.52h17.192L44.017,39.789l24.465,39.893
+		H49.858L30.9,47.504z" />
+					<path fill="#FFFFFF" d="M122.391,48.275h13.664v31.406h-50.69V2.542h15.096v63.697h21.93V48.275z" />
+					<path fill="#FFFFFF" d="M197.985,62.6h-23.03l-5.291,17.081h-15.096l24.904-77.14h15.099l24.794,77.14h-15.867L197.985,62.6z
+		 M178.48,50.479h16.531l-7.823-25.786h-0.992L178.48,50.479z" />
+					<path fill="#FFFFFF" d="M252.29,34.061h-0.553l0.661,9.144v36.476h-14.325V2.542h13.225l26.665,47.166h0.553l-0.992-9.255V2.542
+		h14.328v77.14h-13.225L252.29,34.061z" />
+					<path fill="#FFFFFF" d="M345.491,39.46h26.336v34.823c-2.499,2.278-5.748,4.006-9.751,5.181c-4.006,1.172-8.101,1.761-12.286,1.761
+		c-4.926,0-9.536-0.843-13.832-2.535c-4.299-1.689-8.026-4.242-11.186-7.659c-3.16-3.414-5.659-7.638-7.494-12.672
+		c-1.835-5.031-2.753-10.926-2.753-17.688c0-7.124,1.103-13.186,3.303-18.181c2.206-4.995,5.052-9.091,8.544-12.289
+		c3.486-3.196,7.402-5.524,11.736-6.995S346.738,1,351.001,1c4.409,0,8.08,0.35,11.019,1.049c2.939,0.697,5.62,1.596,8.044,2.699
+		v22.811h-12.122V15.327c-0.589-0.146-1.175-0.293-1.761-0.442c-1.471-0.293-3.088-0.439-4.849-0.439
+		c-3.013,0-5.805,0.514-8.376,1.542c-2.574,1.028-4.795,2.628-6.666,4.792c-1.877,2.17-3.327,4.944-4.352,8.322
+		c-1.031,3.378-1.546,7.42-1.546,12.122c0,4.188,0.514,7.934,1.546,11.24c1.025,3.306,2.457,6.098,4.296,8.376
+		c1.835,2.278,4.021,4.003,6.556,5.178c2.535,1.178,5.273,1.764,8.212,1.764c1.91,0,3.653-0.221,5.234-0.661
+		c1.578-0.442,2.66-0.882,3.252-1.324V50.479h-13.996V39.46H345.491z" />
+					<path fill="#C6C6C6" d="M19.624,200.178c2.427,0,4.663-0.293,6.723-0.882c2.054-0.586,3.838-1.432,5.345-2.535
+		c1.504-1.1,2.681-2.46,3.524-4.077c0.846-1.614,1.267-3.453,1.267-5.509c0-4.039-1.596-7.219-4.792-9.533
+		c-3.196-2.314-7.99-3.471-14.382-3.471c-0.807,0-1.746,0.018-2.81,0.057c-1.064,0.036-2.075,0.093-3.031,0.164
+		c-1.1,0.075-2.242,0.111-3.414,0.111v-40.335h39.89v13.446h-27.55v14.875c0.586,0,1.175-0.036,1.764-0.108
+		c0.514,0,1.01-0.018,1.489-0.057c0.478-0.036,0.897-0.054,1.267-0.054c3.671,0,7.088,0.532,10.247,1.596
+		c3.157,1.067,5.913,2.663,8.266,4.795c2.35,2.131,4.17,4.72,5.456,7.769s1.928,6.409,1.928,10.083c0,4.335-0.81,8.137-2.424,11.404
+		c-1.617,3.27-3.82,6.006-6.612,8.212c-2.792,2.203-6.026,3.874-9.697,5.013c-3.677,1.139-7.605,1.707-11.79,1.707
+		c-1.62,0-3.345-0.164-5.181-0.496c-1.838-0.329-3.638-0.732-5.402-1.211s-3.396-1.01-4.903-1.599
+		c-1.507-0.586-2.774-1.136-3.802-1.653l4.627-11.458c1.25,0.735,3.181,1.542,5.787,2.424
+		C14.022,199.739,16.76,200.178,19.624,200.178z" />
+					<path fill="#FFFFFF" d="M74.281,134.939c3.088-0.586,6.484-1.046,10.194-1.375c3.71-0.332,7.402-0.496,11.078-0.496
+		c3.817,0,7.659,0.314,11.515,0.936c3.856,0.625,7.327,1.874,10.415,3.749c3.085,1.871,5.599,4.481,7.545,7.823
+		c1.949,3.342,2.924,7.698,2.924,13.057c0,4.702-0.849,8.726-2.535,12.068c-1.692,3.342-3.934,6.098-6.723,8.266
+		c-2.795,2.167-5.97,3.746-9.533,4.738s-7.255,1.486-11.075,1.486c-0.368,0-0.954,0-1.761,0c-0.813,0-1.656-0.015-2.535-0.054
+		c-0.885-0.036-1.746-0.09-2.592-0.164c-0.846-0.072-1.45-0.146-1.818-0.221v26.557H74.281V134.939z M96.764,146.071
+		c-1.471,0-2.867,0.054-4.188,0.164c-1.321,0.111-2.388,0.239-3.196,0.386v25.015c0.293,0.075,0.732,0.149,1.324,0.221
+		c0.586,0.075,1.211,0.129,1.871,0.164c0.661,0.039,1.303,0.057,1.928,0.057s1.085,0,1.378,0c1.985,0,3.946-0.182,5.895-0.553
+		c1.946-0.365,3.692-1.046,5.234-2.039c1.545-0.989,2.771-2.368,3.692-4.131c0.918-1.764,1.378-4.077,1.378-6.941
+		c0-2.424-0.439-4.427-1.324-6.009c-0.879-1.578-2.039-2.846-3.468-3.799c-1.435-0.954-3.07-1.617-4.905-1.985
+		C100.545,146.254,98.674,146.071,96.764,146.071z" />
+					<path fill="#FFFFFF" d="M239.54,179.13h-7.823v32.177h-15.096v-77.14h15.096v31.52h7.823l17.634-31.52h17.189l-21.709,37.247
+		l24.465,39.893h-18.624L239.54,179.13z" />
+					<path fill="#FFFFFF" d="M303.676,199.186h12.561V146.29h-10.576v13.335h-12.125v-25.457h60.391v25.457h-12.122V146.29h-10.469
+		v52.896h12.451v12.122h-40.111V199.186z" />
+					<path fill="#FFFFFF" d="M375.498,134.939c1.692-0.29,3.509-0.568,5.459-0.825c1.943-0.257,3.892-0.457,5.838-0.607
+		c1.946-0.146,3.838-0.257,5.677-0.329c1.835-0.075,3.527-0.111,5.07-0.111c3.596,0,7.142,0.35,10.63,1.046
+		c3.492,0.7,6.612,1.892,9.369,3.581c2.756,1.692,4.959,3.967,6.612,6.834c1.653,2.864,2.481,6.427,2.481,10.687
+		c0,3.16-0.317,5.898-0.939,8.212c-0.625,2.314-1.489,4.352-2.589,6.116c-1.103,1.764-2.445,3.288-4.024,4.574
+		s-3.288,2.442-5.124,3.471l18.624,33.72h-17.41l-15.539-30.192h-9.037v30.192h-15.099L375.498,134.939L375.498,134.939z
+		 M398.641,146.511c-1.543,0-3.067,0.039-4.574,0.111c-1.507,0.075-2.663,0.221-3.471,0.442v22.369h5.952
+		c4.185,0,7.602-0.954,10.247-2.867c2.643-1.907,3.967-5.067,3.967-9.476c0-3.306-1.031-5.895-3.085-7.769
+		C405.618,147.449,402.608,146.511,398.641,146.511z" />
+					<path fill="#FFFFFF" d="M486.333,134.168h14.325v49.372c0,4.995-0.661,9.312-1.982,12.947c-1.321,3.638-3.181,6.651-5.566,9.037
+		c-2.388,2.388-5.234,4.17-8.541,5.345c-3.306,1.175-6.944,1.764-10.908,1.764c-9.554,0-16.624-2.317-21.215-6.944
+		s-6.887-11.386-6.887-20.277v-51.243h15.099v48.269c0,5.877,1.064,10.137,3.193,12.782c2.131,2.646,5.473,3.967,10.029,3.967
+		c4.409,0,7.584-1.414,9.533-4.242c1.946-2.828,2.921-6.998,2.921-12.507L486.333,134.168L486.333,134.168z" />
+					<path fill="#FFFFFF" d="M562.457,170.204l0.55-12.011h-0.664l-12.34,20.166h-2.646l-12.893-20.166h-0.55l0.661,10.797v42.317
+		h-14.328v-77.14h15.317l13.225,21.38h0.442l13.111-21.38h15.21v77.14h-15.096L562.457,170.204L562.457,170.204z" />
+					<g>
+						<g>
+							<path fill="#C6C6C6" d="M180.575,201.054c1.507-0.221,2.977-0.511,4.409-0.882c1.432-0.365,2.717-0.732,3.856-1.1
+				s2.039-0.735,2.699-1.103l3.856,11.901c-3.085,1.253-6.281,2.167-9.584,2.756c-3.306,0.586-6.612,0.882-9.919,0.882
+				c-3.895,0-7.677-0.535-11.353-1.599c-3.671-1.064-6.923-2.681-9.751-4.849c-2.828-2.164-5.106-4.828-6.834-7.987
+				c-1.722-3.16-2.589-6.834-2.589-11.022c0-3.453,0.571-6.502,1.71-9.144c1.139-2.646,2.643-4.849,4.517-6.612
+				s4.021-3.085,6.448-3.967c2.421-0.882,4.92-1.324,7.491-1.324h2.535l-19.395-22.148v-10.029h44.96v12.122h-27.879l18.513,22.617
+				v7.907h-6.17c-2.646,0-5.106,0.185-7.384,0.55c-2.275,0.365-4.224,0.986-5.841,1.865c-1.614,0.879-2.882,2.066-3.799,3.563
+				c-0.921,1.501-1.381,3.345-1.381,5.539c0,1.758,0.407,3.384,1.214,4.882c0.807,1.501,1.928,2.816,3.36,3.949
+				c1.435,1.133,3.163,2.012,5.181,2.634c2.021,0.622,4.242,0.933,6.666,0.933C177.583,201.386,179.072,201.275,180.575,201.054z"
+							/>
+						</g>
+					</g>
+					<g>
+						<rect x="407.343" y="66.845" style="fill: #C6C6C6 !important; stroke: transparent;" width="167.977" height="12.244" />
+					</g>
+				</g>
+			</svg>
+		</div>
+		<div>
+			<p id="greez_name">klang<i>user</i></p>
+			<p id="loaderfeed"></p>
+		</div>
+		<div id="loadingBar"></div>
+	</div>
+	<div class="modal_info">
+		<div class="modal_content">
+			<p>Before you start: to analyse and interpret your musical behaviour correctly you should have a look at the legend. 
+				Click on the "?" in the lower right corner or select "legend" in the menu bar to show it.
+			</p>
+			<button id="close_modal">Got it</button>
+		</div>
+	</div>
+	<div id="startViz" style="display: none;"></div>
+	<div id="display_cv">
+		<div id="click_cv" class="cv_child"></div>
+		<div id="hover_cv" class="cv_child"></div>
+	</div>
+	<div id="outerControls">
+		<div id="controls">
+
+		</div>
+	</div>
+	<div id="canvasContainer"></div>
+
+	<!-- timeline tool-->
+	<div id="timeWrapper">
+		<div id="timeScrollbar">
+			<div id="timelist">
+			</div>
+		</div>
+		<div id="arrow_up">&darr;</div>
+		<div id="arrow_down">&darr;</div>
+	</div>
+
+	<!-- scale tool-->
+	<div id="scaleContainer">
+		<div id="scaleList">
+			<p id="scale05" class="scaleButton">x1</p>
+			<p id="scale1" class="scaleButton current_scale">x2</p>
+			<p id="scale2" class="scaleButton">x4</p>
+			<p id="scale4" class="scaleButton">x8</p>
+		</div>
+	</div>
+
+	<!-- infos menu -->
+	<div id="infoContainer" class="smallIC">
+		<div id="info_legende" >?</div>
+		<button id="closeInfoContainer" class "closer button-none">Close</button>
+		<button id="openInfoContainer" class "opener">Get songs and genres</button>
+		<div class="info">
+			<p id="categorie"></p>
+			<p id="value"></p>
+			<div id="playerContainer">
+				<audio src="#" controls id="audioPlayer">Sorry, your Browser doesn't support html5.</audio>
+				<h2 class="info_h2">SONGS</h2>
+				<ul id="playlist">
+				</ul>
+			</div>
+			<div id="genreContainer">
+				<h2 class="info_h2">GENRE</h2>
+				<ul id="genrelist">
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="logo_viz">
+		<?xml version="1.0" encoding="utf-8"?>
+		<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+		<svg version="1.1" id="Ebene_1" class="logo_svg_small" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+			x="0px" y="0px" width="580px" height="215px" viewBox="14 0 580 215" enable-background="new 14 0 580 215" xml:space="preserve">
+			<g>
+				<path fill="#6F6F6E" d="M44.9,47.504h-7.82v32.177h-15.1V2.542h15.099v31.52h7.82l17.634-31.52h17.192L58.017,39.789l24.465,39.893
+		H63.858L44.9,47.504z" />
+				<path fill="#6F6F6E" d="M136.391,48.275h13.664v31.406h-50.69V2.542h15.096v63.697h21.93V48.275z" />
+				<path fill="#6F6F6E" d="M211.985,62.6h-23.03l-5.291,17.081h-15.096l24.904-77.14h15.099l24.794,77.14h-15.867L211.985,62.6z
+		 M192.48,50.479h16.531l-7.823-25.786h-0.992L192.48,50.479z" />
+				<path fill="#6F6F6E" d="M266.29,34.061h-0.553l0.661,9.144v36.476h-14.325V2.542h13.225l26.665,47.166h0.553l-0.992-9.255V2.542
+		h14.328v77.14h-13.225L266.29,34.061z" />
+				<path fill="#6F6F6E" d="M359.491,39.46h26.336v34.823c-2.499,2.278-5.748,4.006-9.751,5.181c-4.006,1.172-8.101,1.761-12.286,1.761
+		c-4.926,0-9.536-0.843-13.832-2.535c-4.299-1.689-8.026-4.242-11.186-7.659c-3.16-3.414-5.659-7.638-7.494-12.672
+		c-1.835-5.031-2.753-10.926-2.753-17.688c0-7.124,1.103-13.186,3.303-18.181c2.206-4.995,5.052-9.091,8.544-12.289
+		c3.486-3.196,7.402-5.524,11.736-6.995S360.738,1,365.001,1c4.409,0,8.08,0.35,11.019,1.049c2.939,0.697,5.62,1.596,8.044,2.699
+		v22.811h-12.122V15.327c-0.589-0.146-1.175-0.293-1.761-0.442c-1.471-0.293-3.088-0.439-4.849-0.439
+		c-3.013,0-5.805,0.514-8.376,1.542c-2.574,1.028-4.795,2.628-6.666,4.792c-1.877,2.17-3.327,4.944-4.352,8.322
+		c-1.031,3.378-1.546,7.42-1.546,12.122c0,4.188,0.514,7.934,1.546,11.24c1.025,3.306,2.457,6.098,4.296,8.376
+		c1.835,2.278,4.021,4.003,6.556,5.178c2.535,1.178,5.273,1.764,8.212,1.764c1.91,0,3.653-0.221,5.234-0.661
+		c1.578-0.442,2.66-0.882,3.252-1.324V50.479h-13.996V39.46H359.491z" />
+				<path fill="#B1B1B1" d="M33.624,200.178c2.427,0,4.663-0.293,6.723-0.882c2.054-0.586,3.838-1.432,5.345-2.535
+		c1.504-1.1,2.681-2.46,3.524-4.077c0.846-1.614,1.267-3.453,1.267-5.509c0-4.039-1.596-7.219-4.792-9.533
+		c-3.196-2.314-7.99-3.471-14.382-3.471c-0.807,0-1.746,0.018-2.81,0.057c-1.064,0.036-2.075,0.093-3.031,0.164
+		c-1.1,0.075-2.242,0.111-3.414,0.111v-40.335h39.89v13.446h-27.55v14.875c0.586,0,1.175-0.036,1.764-0.108
+		c0.514,0,1.01-0.018,1.489-0.057c0.478-0.036,0.897-0.054,1.267-0.054c3.671,0,7.088,0.532,10.247,1.596
+		c3.157,1.067,5.913,2.663,8.266,4.795c2.35,2.131,4.17,4.72,5.456,7.769c1.286,3.049,1.928,6.409,1.928,10.083
+		c0,4.335-0.81,8.137-2.424,11.404c-1.617,3.27-3.82,6.006-6.612,8.212c-2.792,2.203-6.026,3.874-9.697,5.013
+		c-3.677,1.139-7.605,1.707-11.79,1.707c-1.62,0-3.345-0.164-5.181-0.496c-1.838-0.329-3.638-0.732-5.402-1.211
+		s-3.396-1.01-4.903-1.599c-1.507-0.586-2.774-1.136-3.802-1.653l4.627-11.458c1.25,0.735,3.181,1.542,5.787,2.424
+		C28.022,199.739,30.76,200.178,33.624,200.178z" />
+				<path fill="#6F6F6E" d="M88.281,134.939c3.088-0.586,6.484-1.046,10.194-1.375c3.71-0.332,7.402-0.496,11.078-0.496
+		c3.817,0,7.659,0.314,11.515,0.936c3.856,0.625,7.327,1.874,10.415,3.749c3.085,1.871,5.599,4.481,7.545,7.823
+		c1.949,3.342,2.924,7.698,2.924,13.057c0,4.702-0.849,8.726-2.535,12.068c-1.692,3.342-3.934,6.098-6.723,8.266
+		c-2.795,2.167-5.97,3.746-9.533,4.738s-7.255,1.486-11.075,1.486c-0.368,0-0.954,0-1.761,0c-0.813,0-1.656-0.015-2.535-0.054
+		c-0.885-0.036-1.746-0.09-2.592-0.164c-0.846-0.072-1.45-0.146-1.818-0.221v26.557H88.281V134.939z M110.764,146.071
+		c-1.471,0-2.867,0.054-4.188,0.164c-1.321,0.111-2.388,0.239-3.196,0.386v25.015c0.293,0.075,0.732,0.149,1.324,0.221
+		c0.586,0.075,1.211,0.129,1.871,0.164c0.661,0.039,1.303,0.057,1.928,0.057s1.085,0,1.378,0c1.985,0,3.946-0.182,5.895-0.553
+		c1.946-0.365,3.692-1.046,5.234-2.039c1.545-0.989,2.771-2.368,3.692-4.131c0.918-1.764,1.378-4.077,1.378-6.941
+		c0-2.424-0.439-4.427-1.324-6.009c-0.879-1.578-2.039-2.846-3.468-3.799c-1.435-0.954-3.07-1.617-4.905-1.985
+		C114.545,146.254,112.674,146.071,110.764,146.071z" />
+				<path fill="#6F6F6E" d="M253.54,179.13h-7.823v32.177h-15.096v-77.14h15.096v31.52h7.823l17.634-31.52h17.189l-21.709,37.247
+		l24.465,39.893h-18.624L253.54,179.13z" />
+				<path fill="#6F6F6E" d="M317.676,199.186h12.561V146.29h-10.576v13.335h-12.125v-25.457h60.391v25.457h-12.122V146.29h-10.469
+		v52.896h12.451v12.122h-40.111V199.186z" />
+				<path fill="#6F6F6E" d="M389.498,134.939c1.692-0.29,3.509-0.568,5.459-0.825c1.943-0.257,3.892-0.457,5.838-0.607
+		c1.946-0.146,3.838-0.257,5.677-0.329c1.835-0.075,3.527-0.111,5.07-0.111c3.596,0,7.142,0.35,10.63,1.046
+		c3.492,0.7,6.612,1.892,9.369,3.581c2.756,1.692,4.959,3.967,6.612,6.834c1.653,2.864,2.481,6.427,2.481,10.687
+		c0,3.16-0.317,5.898-0.939,8.212c-0.625,2.314-1.489,4.352-2.589,6.116c-1.103,1.764-2.445,3.288-4.024,4.574
+		s-3.288,2.442-5.124,3.471l18.624,33.72h-17.41l-15.539-30.192h-9.037v30.192h-15.099L389.498,134.939L389.498,134.939z
+		 M412.641,146.511c-1.543,0-3.067,0.039-4.574,0.111c-1.507,0.075-2.663,0.221-3.471,0.442v22.369h5.952
+		c4.185,0,7.602-0.954,10.247-2.867c2.643-1.907,3.967-5.067,3.967-9.476c0-3.306-1.031-5.895-3.085-7.769
+		C419.618,147.449,416.608,146.511,412.641,146.511z" />
+				<path fill="#6F6F6E" d="M500.333,134.168h14.325v49.372c0,4.995-0.661,9.312-1.982,12.947c-1.321,3.638-3.181,6.651-5.566,9.037
+		c-2.388,2.388-5.234,4.17-8.541,5.345c-3.306,1.175-6.944,1.764-10.908,1.764c-9.554,0-16.624-2.317-21.215-6.944
+		s-6.887-11.386-6.887-20.277v-51.243h15.099v48.269c0,5.877,1.064,10.137,3.193,12.782c2.131,2.646,5.473,3.967,10.029,3.967
+		c4.409,0,7.584-1.414,9.533-4.242c1.946-2.828,2.921-6.998,2.921-12.507L500.333,134.168L500.333,134.168z" />
+				<path fill="#6F6F6E" d="M576.457,170.204l0.55-12.011h-0.664l-12.34,20.166h-2.646l-12.893-20.166h-0.55l0.661,10.797v42.317
+		h-14.328v-77.14h15.317l13.225,21.38h0.442l13.111-21.38h15.21v77.14h-15.096L576.457,170.204L576.457,170.204z" />
+				<g>
+					<g>
+						<path fill="#B1B1B1" d="M194.575,201.054c1.507-0.221,2.977-0.511,4.409-0.882c1.432-0.365,2.717-0.732,3.856-1.1
+				s2.039-0.735,2.699-1.103l3.856,11.901c-3.085,1.253-6.281,2.167-9.584,2.756c-3.306,0.586-6.612,0.882-9.919,0.882
+				c-3.895,0-7.677-0.535-11.353-1.599c-3.671-1.064-6.923-2.681-9.751-4.849c-2.828-2.164-5.106-4.828-6.834-7.987
+				c-1.722-3.16-2.589-6.834-2.589-11.022c0-3.453,0.571-6.502,1.71-9.144c1.139-2.646,2.643-4.849,4.517-6.612
+				s4.021-3.085,6.448-3.967c2.421-0.882,4.92-1.324,7.491-1.324h2.535l-19.395-22.148v-10.029h44.96v12.122h-27.879l18.513,22.617
+				v7.907h-6.17c-2.646,0-5.106,0.185-7.384,0.55c-2.275,0.365-4.224,0.986-5.841,1.865c-1.614,0.879-2.882,2.066-3.799,3.563
+				c-0.921,1.501-1.381,3.345-1.381,5.539c0,1.758,0.407,3.384,1.214,4.882c0.807,1.501,1.928,2.816,3.36,3.949
+				c1.435,1.133,3.163,2.012,5.181,2.634c2.021,0.622,4.242,0.933,6.666,0.933C191.583,201.386,193.072,201.275,194.575,201.054z"
+						/>
+					</g>
+				</g>
+				<g>
+					<rect x="421.343" y="66.845" style="fill: #B1B1B1 !important" width="167.977" height="12.244" />
+				</g>
+			</g>
+		</svg>
+	</div>
+	<script src="app.js"></script>
+	<script src="bundle.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,5 @@
+.DS_Store
+node_modules
+README.md
+public/lib
+public/mylib
