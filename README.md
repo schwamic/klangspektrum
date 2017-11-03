@@ -1,3 +1,3 @@
 # klangspektrum
 
-http://www.klangspektrum.digital/
+https://developer.spotify.com/showcase/item/klangspektrum/
